@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image Compressor — Card UI with PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .search-bar {
+      margin-top: 30px;
+      width: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .search-bar button {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    .search-bar button:hover {
+      background: #2563eb;
+    }
+
+    .card {
+      background: #fff;
+      width: 400px;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.3s ease;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+      color: #111827;
+      font-size: 1.5rem;
+    }
+
+    .card p {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .drop-area {
+      border: 2px dashed #9ca3af;
+      border-radius: 10px;
+      padding: 30px;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .drop-area:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .controls {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .controls label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+      color: #374151;
+    }
+
+    .controls input, .controls select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 10px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 10px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #2563eb;
+    }
+
+    .preview {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .preview img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .file-info {
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+
+    .download-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .download-btns button {
+      flex: 1;
+    }
+
+    .tools-section {
+      text-align: center;
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tools-section h1 {
+      color: #111827;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .tools {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 900px;
+    }
+
+    .tool-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 25px;
+      width: 200px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .tool-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+
+    .tool-card p {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .coming-soon {
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Search tools..." id="search-input">
+    <button id="search-btn">Search</button>
+  </div>
+
+  <div class="card">
+    <h2>Image Compressor</h2>
+    <p>Compress and optimize your images easily in your browser.</p>
+
+    <div class="drop-area" id="drop-area">
+      <p>Drag & drop your image here or <label for="file-input" style="color:#3b82f6; cursor:pointer;">browse</label></p>
+      <input type="file" id="file-input" accept="image/*" />
+    </div>
+
+    <div class="controls">
+      <label for="quality">Quality</label>
+      <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8" />
+
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="auto">Auto</option>
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/webp">WebP</option>
+        <option value="image/png">PNG</option>
+      </select>
+
+      <button class="btn" id="compress-btn">Compress</button>
+    </div>
+
+    <div class="preview" id="preview"></div>
+    <div class="download-btns" id="download-btns" style="display:none;">
+      <button class="btn" id="download-image">Download Image</button>
+      <button class="btn" id="download-pdf">Download PDF</button>
+    </div>
+
+    <div class="tools-section">
+      <h1>TOOLS — More Coming Soon 🚀</h1>
+      <div class="tools">
+        <div class="tool-card">
+          <h3>Video Tools</h3>
+          <p>Convert, compress, and edit videos.</p>
+          <span class="coming-soon">Coming Soon</span>
+        </div>
+        <div class="tool-card">
+          <h3>PDF Tools</h3>
+          <p>Merge, split, and convert PDFs.</p>
+          <span class="coming-soon">Coming Soon</span>
+        </div>
+        <div class="tool-card">
+          <h3>Extras</h3>
+          <p>More file utilities and add-ons.</p>
+          <span class="coming-soon">Coming Soon</span>
+        </div>
+        <div class="tool-card">
+          <h3>AI</h3>
+          <p>Smart AI-powered tools.</p>
+          <span class="coming-soon">Coming Soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>✨ More Tools Coming Soon — Stay Tuned for New Features!</p>
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const dropArea = document.getElementById('drop-area');
+    const preview = document.getElementById('preview');
+    const compressBtn = document.getElementById('compress-btn');
+    const qualityInput = document.getElementById('quality');
+    const formatSelect = document.getElementById('format');
+    const downloadBtns = document.getElementById('download-btns');
+    const downloadImageBtn = document.getElementById('download-image');
+    const downloadPdfBtn = document.getElementById('download-pdf');
+
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+
+    let selectedFile, compressedBlob, imgUrl;
+
+    searchBtn.addEventListener('click', () => {
+      const query = searchInput.value.toLowerCase();
+      const tools = document.querySelectorAll('.tool-card');
+      tools.forEach(tool => {
+        const title = tool.querySelector('h3').innerText.toLowerCase();
+        tool.style.display = title.includes(query) ? 'block' : 'none';
+      });
+    });
+
+    dropArea.addEventListener('click', () => fileInput.click());
+
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.style.borderColor = '#3b82f6';
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.style.borderColor = '#9ca3af';
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.style.borderColor = '#9ca3af';
+      if (e.dataTransfer.files.length > 0) {
+        selectedFile = e.dataTransfer.files[0];
+        showPreview(selectedFile);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        selectedFile = e.target.files[0];
+        showPreview(selectedFile);
+      }
+    });
+
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        preview.innerHTML += `<p class='file-info'>${file.name} (${(file.size/1024).toFixed(1)} KB)</p>`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    compressBtn.addEventListener('click', async () => {
+      if (!selectedFile) return alert('Please select an image first');
+
+      const quality = parseFloat(qualityInput.value);
+      const format = formatSelect.value === 'auto' ? selectedFile.type : formatSelect.value;
+
+      const img = new Image();
+      img.src = URL.createObjectURL(selectedFile);
+      await img.decode();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob((blob) => {
+        compressedBlob = blob;
+        imgUrl = URL.createObjectURL(blob);
+
+        preview.innerHTML = `<img src="${imgUrl}" alt="Compressed Preview">`;
+        preview.innerHTML += `<p class='file-info'>Compressed Size: ${(blob.size/1024).toFixed(1)} KB</p>`;
+        downloadBtns.style.display = 'flex';
+      }, format, quality);
+    });
+
+    downloadImageBtn.addEventListener('click', () => {
+      if (!compressedBlob) return;
+      const link = document.createElement('a');
+      link.href = imgUrl;
+      link.download = selectedFile.name.replace(/\.[^.]+$/, '') + '-compressed.' + (formatSelect.value.split('/')[1] || 'jpg');
+      link.click();
+    });
+
+    downloadPdfBtn.addEventListener('click', async () => {
+      if (!compressedBlob) return;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const img = await createImageBitmap(compressedBlob);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (img.height * pdfWidth) / img.width;
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(selectedFile.name.replace(/\.[^.]+$/, '') + '-compressed.pdf');
+    });
+  </script>
+</body>
+</html>
